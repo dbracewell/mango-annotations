@@ -1,0 +1,118 @@
+import com.davidbracewell.DynamicEnum;
+import com.davidbracewell.HierarchicalEnumValue;
+import com.davidbracewell.config.Config;
+import com.davidbracewell.string.StringUtils;
+import java.util.List;
+import java.util.LinkedList;
+
+import java.io.ObjectStreamException;
+import java.util.Collection;
+
+$JAVADOC
+public final class $TYPE_NAME extends HierarchicalEnumValue $IMPLEMENTS {
+
+  private static final DynamicEnum<$TYPE_NAME> index = new DynamicEnum<>();
+  private static final long serialVersionUID = 1L;
+
+  public static $TYPE_NAME ROOT = create("$ROOT_NAME");
+
+  private $TYPE_NAME(String name) {
+    super(name);
+  }
+
+  private $TYPE_NAME(String name, $TYPE_NAME parent) {
+    super(name, parent);
+  }
+
+  /**
+   * Creates a new $TYPE_NAME Type or retrieves an already existing one for a given name
+   *
+   * @param name the name
+   * @return the $TYPE_NAME type
+   */
+  public static $TYPE_NAME create(String name) {
+    if (StringUtils.isNullOrBlank(name)) {
+      throw new IllegalArgumentException(name + " is invalid");
+    }
+    return index.register(new $TYPE_NAME(name));
+  }
+
+    /**
+     * Creates a new $TYPE_NAME Type or retrieves an already existing one for a given name
+     *
+     * @param name the name
+     * @return the $TYPE_NAME type
+     */
+    public static $TYPE_NAME create(String name, $TYPE_NAME parent) {
+      if (StringUtils.isNullOrBlank(name)) {
+        throw new IllegalArgumentException(name + " is invalid");
+      }
+      $TYPE_NAME type = index.register(new $TYPE_NAME(name, parent));
+      if( type.getParent() != parent ){
+        throw new IllegalArgumentException(name + " is already registered with different parent.");
+      }
+      return type;
+    }
+
+  /**
+   * Determine if an $TYPE_NAME exists for the given name
+   *
+   * @param name the name
+   * @return True if it exists, otherwise False
+   */
+  public static boolean isDefined(String name) {
+    return index.isDefined(name);
+  }
+
+  /**
+   * Gets the $TYPE_NAME from its name. Throws an <code>IllegalArgumentException</code> if the name is not valid.
+   *
+   * @param name the name as a string
+   * @return the $TYPE_NAME for the string
+   */
+  public static $TYPE_NAME valueOf(String name) {
+    return index.valueOf(name);
+  }
+
+  /**
+   * Returns the values for this dynamic enum
+   *
+   * @return All known $TYPE_NAME
+   */
+  public static Collection<$TYPE_NAME> values() {
+    return index.values();
+  }
+
+  private Object readResolve() throws ObjectStreamException {
+    if (isDefined(name())) {
+      return index.valueOf(name());
+    }
+    return index.register(this);
+  }
+
+  @Override
+  protected HierarchicalEnumValue getParentConfig(){
+    if( Config.hasProperty("$CONFIG_PREFIX." + name() + ".parent") ) {
+      return create(Config.get("$CONFIG_PREFIX." + name() + ".parent").asString());
+    }
+    return ROOT;
+  }
+
+  @Override
+  public $TYPE_NAME getParent(){
+    if( this == ROOT ){ return null; }
+    return ($TYPE_NAME)super.getParent();
+  }
+
+  @Override
+  public List<$TYPE_NAME> getChildren(){
+    List<$TYPE_NAME > children = new LinkedList<>();
+    for( $TYPE_NAME  e : values()) {
+         if( !e.isRoot() && e.getParent().equals(this)){
+             children.add(e);
+           }
+    }
+    return children;
+  }
+
+}//END OF $TYPE_NAME
