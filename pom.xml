@@ -82,7 +82,7 @@
         <dependency>
             <artifactId>mango</artifactId>
             <groupId>com.davidbracewell</groupId>
-            <version>0.3</version>
+            <version>0.4-SNAPSHOT4-SNAPSHOT4-SNAPSHOT4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.kohsuke.metainf-services</groupId>
