@@ -87,7 +87,7 @@ public class PreloadProcessor extends AbstractProcessor {
       });
 
 
-    return true;
+    return false;
   }
 
 }//END OF DynamicEnumProcessor
