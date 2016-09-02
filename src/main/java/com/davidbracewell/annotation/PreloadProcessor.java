@@ -21,24 +21,16 @@
 
 package com.davidbracewell.annotation;
 
-import com.davidbracewell.conversion.Cast;
-import com.davidbracewell.io.QuietIO;
 import org.kohsuke.MetaInfServices;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,43 +43,73 @@ import java.util.Set;
 @MetaInfServices(Processor.class)
 public class PreloadProcessor extends AbstractProcessor {
 
-  private Set<String> classNames = new HashSet<>();
+   private Set<String> classNames = new HashSet<>();
 
-  public PreloadProcessor() {
-    super();
-  }
+   public PreloadProcessor() {
+      super();
+   }
 
-  @Override
-  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    if (roundEnv.processingOver()) {
-      FileObject f;
-      PrintWriter pw;
-      OutputStreamWriter os = null;
-      try {
-        f = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/preload.ini");
-        os = new OutputStreamWriter(f.openOutputStream(), StandardCharsets.UTF_8);
-        pw = new PrintWriter(os);
-        classNames.forEach(pw::println);
-      } catch (IOException e) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
-      } finally {
-        QuietIO.closeQuietly(os);
+   @Override
+   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
+      if (roundEnv.processingOver()) {
+         FileObject f;
+         PrintWriter pw;
+         OutputStreamWriter os = null;
+         InputStreamReader is = null;
+
+         try {
+            f = processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/preload.classes");
+            is = new InputStreamReader(f.openInputStream(), StandardCharsets.UTF_8);
+            BufferedReader bufferedReader = new BufferedReader(is);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+               classNames.add(line.trim());
+            }
+         } catch (IOException e) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+         } finally {
+            try {
+               if (is != null) {
+                  is.close();
+               }
+            } catch (IOException e) {
+               //noop
+            }
+         }
+
+
+         try {
+            f = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/preload.classes");
+            os = new OutputStreamWriter(f.openOutputStream(), StandardCharsets.UTF_8);
+            pw = new PrintWriter(os);
+            classNames.forEach(pw::println);
+         } catch (IOException e) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+         } finally {
+            try {
+               if (os != null) {
+                  os.close();
+               }
+            } catch (IOException e) {
+               //noop
+            }
+         }
+         return false;
       }
+
+
+      roundEnv
+            .getElementsAnnotatedWith(Preload.class)
+            .stream()
+            .filter(e -> e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)
+            .forEach(e -> {
+               TypeElement classElement = (TypeElement) e;
+               classNames.add(classElement.getQualifiedName().toString());
+            });
+
+
       return false;
-    }
-
-
-    roundEnv
-      .getElementsAnnotatedWith(Preload.class)
-      .stream()
-      .filter(e -> e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)
-      .forEach(e -> {
-        TypeElement classElement = Cast.as(e);
-        classNames.add(classElement.getQualifiedName().toString());
-      });
-
-
-    return false;
-  }
+   }
 
 }//END OF DynamicEnumProcessor

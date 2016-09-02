@@ -80,11 +80,6 @@
     </profiles>
     <dependencies>
         <dependency>
-            <artifactId>mango</artifactId>
-            <groupId>com.davidbracewell</groupId>
-            <version>0.4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
             <version>1.7</version>
