@@ -67,7 +67,11 @@ public class PreloadProcessor extends AbstractProcessor {
                classNames.add(line.trim());
             }
          } catch (IOException e) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            if (e.getMessage().contains("(No such file or directory)")) {
+               //no opt
+            } else {
+               processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            }
          } finally {
             try {
                if (is != null) {
@@ -100,13 +104,13 @@ public class PreloadProcessor extends AbstractProcessor {
 
 
       roundEnv
-            .getElementsAnnotatedWith(Preload.class)
-            .stream()
-            .filter(e -> e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)
-            .forEach(e -> {
-               TypeElement classElement = (TypeElement) e;
-               classNames.add(classElement.getQualifiedName().toString());
-            });
+         .getElementsAnnotatedWith(Preload.class)
+         .stream()
+         .filter(e -> e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)
+         .forEach(e -> {
+            TypeElement classElement = (TypeElement) e;
+            classNames.add(classElement.getQualifiedName().toString());
+         });
 
 
       return false;
