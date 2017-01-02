@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.davidbracewell</groupId>
     <artifactId>mango-annotations</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Annotation processors for DynamicEnums to automatically create boilerplate code.</description>
@@ -37,7 +37,7 @@
         <connection>scm:git:git@github.com:dbracewell/mango-annotations.git</connection>
         <developerConnection>scm:git:git@github.com:dbracewell/mango-annotations.git</developerConnection>
         <url>git@github.com:dbracewell/mango-annotations.git</url>
-        <tag>mango-annotations-0.2</tag>
+        <tag>mango-annotations-0.3</tag>
     </scm>
     <developers>
         <developer>
@@ -79,11 +79,6 @@
         </profile>
     </profiles>
     <dependencies>
-        <dependency>
-            <artifactId>mango</artifactId>
-            <groupId>com.davidbracewell</groupId>
-            <version>0.3</version>
-        </dependency>
         <dependency>
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
