@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package com.davidbracewell.annotation;
+package com.gengoai.annotation;
 
 import org.kohsuke.MetaInfServices;
 
